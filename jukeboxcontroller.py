@@ -20,7 +20,8 @@ class JukeboxController:
                 pattern = self.reader.get_pattern()
                 if not pattern:
                     continue
-
+                print(f"Read pattern: {pattern}")
+                pattern = self.decoder.clean_pattern(pattern)
                 decoded = self.decoder.decode(tuple(pattern))
                 if decoded:
                     print(f"Decoded selection: {decoded}")

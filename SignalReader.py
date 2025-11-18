@@ -3,7 +3,7 @@ import time
 import threading
 
 class SignalReader:
-    def __init__(self, pin: int, pattern_idle_timeout_us: int = 800_000):
+    def __init__(self, pin: int, pattern_idle_timeout_us: int = 400_000):
         self.pin = pin
         self.pattern_idle_timeout_us = pattern_idle_timeout_us
         self.pattern = []
@@ -12,6 +12,7 @@ class SignalReader:
         self.lock = threading.Lock()
         self.running = False
         self.debug_time = 0
+        self.last_time_test = 0
 
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(self.pin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
@@ -48,6 +49,7 @@ class SignalReader:
             self.pattern.append(duration)
 
         self.last_tick_ns = current_tick_ns
+        self.last_time_test = self.last_tick_ns
         self.last_level = level
 
     def get_pattern(self):
