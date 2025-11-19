@@ -1,7 +1,7 @@
 from PatternDecoder import PatternDecoder
 from RaspberrySender import RaspberrySender
 from SignalReader import SignalReader
-from aduiocontroller import AudioController
+from audiocontroller import AudioController
 import time
 import os
 MUSIC_FOLDER = "/mnt/usb"
