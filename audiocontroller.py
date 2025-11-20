@@ -17,6 +17,7 @@ class AudioController:
         self.player = vlc.MediaPlayer()
         self.folder_path = folder_path
         self.paused = False
+        self.bluetooth = False  # Set to True if using Bluetooth audio output
 
         # Optional: set specific audio output device
         try:
@@ -78,8 +79,11 @@ class AudioController:
             media = vlc.Media(filepath)
             self.player.set_media(media)
             try:
-                self.player.audio_output_set("alsa")
-                self.player.audio_output_device_set("alsa", "hw:1,0")
+                if not self.bluetooth:
+                    self.player.audio_output_set("alsa")
+                    self.player.audio_output_device_set("alsa", "hw:1,0")
+                elif self.bluetooth:
+                    self.player.audio_output_set("pulse")
                 #self.player.audio_output_device_set(None, "hw:1,0")
             except Exception:
                 pass
@@ -117,7 +121,8 @@ class AudioController:
     # ----------------------------------------------------------------------
     # Public API
     # ----------------------------------------------------------------------
-    def play(self, filepath, file_to_play):
+    def play(self, filepath, file_to_play, bluetooth):
+        self.bluetooth = bluetooth
         self.queue.put(filepath)
         self.queue2.put(file_to_play[:-4])
         #if self.ui_controller:
@@ -223,8 +228,9 @@ class AudioController:
         for i in range(10):
             self.queue_random_song()
 
-    def queue_folder(self, folder_path):
+    def queue_folder(self, folder_path, bluetooth):
         """Queue all audio files from the specified folder."""
+        self.bluetooth = bluetooth
         if not os.path.isdir(folder_path):
             print(f"Invalid folder path: {folder_path}")
             return

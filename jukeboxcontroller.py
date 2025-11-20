@@ -4,7 +4,7 @@ from SignalReader import SignalReader
 from audiocontroller import AudioController
 import time
 import os
-MUSIC_FOLDER = "/mnt/usb"
+MUSIC_FOLDER = "/media/daniel/0103-FBB9"
 
 class JukeboxController:
     def __init__(self, pin: int, receiver_ip: str, receiver_port: int, known_patterns: dict):
@@ -33,9 +33,14 @@ class JukeboxController:
                     print(f"Decoded selection: {decoded}")
                     if decoded == "K9":
                         if os.path.exists(self.folder_path):
+                            #print("Switching Bluetooth mode")
                             if self.is_bluetooth:
+                                print("Stopping Bluetooth mode")
+                                self.audio_controller.stop()
                                 self.is_bluetooth = False
                             elif not self.is_bluetooth:
+                                print("Starting Bluetooth mode")
+                                self.sender.send("K8")
                                 self.is_bluetooth = True
 
                     if self.is_bluetooth:
@@ -58,9 +63,9 @@ class JukeboxController:
                                 file_to_play = matching_files[0]
                                 full_path = os.path.join(self.folder_path, file_to_play)
                                 if os.path.isfile(full_path):
-                                    self.audio_controller.play(full_path, file_to_play)
+                                    self.audio_controller.play(full_path, file_to_play, self.is_bluetooth)
                                 elif os.path.isdir(full_path):
-                                    self.audio_controller.queue_folder(full_path)
+                                    self.audio_controller.queue_folder(full_path, self.is_bluetooth)
                                 print(f"Playing file: {file_to_play}")
                     else:
                         self.sender.send(decoded)

@@ -7,6 +7,10 @@ class RaspberrySender:
         self.port = port
 
     def send(self, message: str):
-        with socket.socket() as s:
-            s.connect((self.host, self.port))
-            s.sendall(message.encode('utf-8'))
+        try:
+            with socket.socket() as s:
+                s.settimeout(3)  # optional: avoid long hang
+                s.connect((self.host, self.port))
+                s.sendall(message.encode('utf-8'))
+        except (ConnectionRefusedError, socket.timeout, OSError) as e:
+            print(f"⚠️ Could not send message: {e}")
